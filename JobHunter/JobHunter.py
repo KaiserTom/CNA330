@@ -19,7 +19,7 @@ def connect_to_sql():
 # Create the table structure
 def create_tables(cursor, table):
     ## Add your code here. Starter code below
-    cursor.execute('''CREATE TABLE IF NOT EXISTS tablename (id INT PRIMARY KEY); ''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Jobs (id INT PRIMARY KEY, PostDate DATE, Title TEXT, Location TEXT, Description TEXT, Company TEXT, Apply_info TEXT, Salary FLOAT, RawMessage TEXT); ''')
     return
 
 # Query the database.
@@ -60,14 +60,14 @@ def fetch_new_jobs(arg_dict):
 
 # Load a text-based configuration file
 def load_config_file(filename):
-    argument_dictionary = 0
+    argument_dictionary = []
     # Code from https://github.com/RTCedu/CNA336/blob/master/Spring2018/FileIO.py
     rel_path = os.path.abspath(os.path.dirname(__file__))
     file = 0
     file_contents = 0
     try:
         file = open(filename, "r")
-        file_contents = file.read()
+        #file_contents = file.read()
     except FileNotFoundError:
         print("File not found, it will be created.")
         file = open(filename, "w")
@@ -75,6 +75,12 @@ def load_config_file(filename):
         file.close()
 
     ## Add in information for argument dictionary
+
+    for aline in file:
+        aline = aline.strip()
+        argument_dictionary.append(aline)
+
+    file.close()
     return argument_dictionary
 
 # Main area of the code.
