@@ -46,18 +46,21 @@ def delete_job(cursor, jobdetails):
     return query_sql(cursor, query)
 
 # Grab new jobs from a website
-def fetch_new_jobs(arg_dict):
-    # Code from https://github.com/RTCedu/CNA336/blob/master/Spring2018/Sql.py
-    query = "https://jobs.github.com/positions.json?" + "location=seattle" # Add arguments here
-    jsonpage = 0
-    try:
-        contents = urllib.request.urlopen(query)
-        response = contents.read()
-        jsonpage = json.loads(response)
-    except:
-        pass
-    return jsonpage
-
+def fetch_new_jobs(cursor, arg_dict):
+   # Code from https://github.com/RTCedu/CNA336/blob/master/Spring2018/Sql.py
+   query = "https://jobs.github.com/positions.json?description=&location=washington" # Add arguments here
+   jsonpage = 0
+   try:
+       contents = urllib.request.urlopen(query)
+       response = contents.read()
+       jsonpage = json.loads(response)
+       for page in jsonpage:
+           print(page['location'])
+           page['location']
+           cursor.execute("INSERT INTO Jobs ("+page['PostDate']+", "+page['Title']+", "+page['Location']+", "+page['Description']+", "+page['Company']+", "+page['Apply_info']+", "+page['Salary']+", "+page['RawMessage']+") "
+   except:
+       pass
+   return jsonpage
 # Load a text-based configuration file
 def load_config_file(filename):
     argument_dictionary = []
@@ -89,6 +92,23 @@ def jobhunt(arg_dict):
     jobpage = fetch_new_jobs(arg_dict)
     # print (jobpage)
     ## Add your code here to parse the job page
+    #from bs4 import BeautifulSoup
+    #import requests
+
+    #job_soup = "https://seattle.craigslist.org/search/jjj"
+    #r = requests.get(job_soup)
+    #soup = BeautifulSoup(r.text, 'html.parser')
+    ### print(r.text)
+    ### grid-list-container
+    #soup_name = soup.find_all('p')
+    ### print(soup_name)
+    #soup_names = []
+    #for i in range(3, 12):
+    #soup_names.append(soup.find_all('p')[i].get_text())
+    #for i in range(0, len(soup_names)):
+    #soup_names[i] = soup_names[i].replace('\t', '')
+    #soup_names[i] = soup_names[i].replace('\n', '')
+    #print(soup_names)
 
     ## Add in your code here to check if the job already exists in the DB
 
