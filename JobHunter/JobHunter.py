@@ -19,7 +19,7 @@ def connect_to_sql():
 # Create the table structure
 def create_tables(cursor, table):
     ## Add your code here. Starter code below
-    cursor.execute('''CREATE TABLE IF NOT EXISTS Jobs (id INT PRIMARY KEY, PostDate DATE, Title TEXT, Location TEXT, Description TEXT, Company TEXT, Apply_info TEXT, Salary FLOAT, RawMessage TEXT); ''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Jobs (id INT PRIMARY KEY, PostDate TEXT, Title TEXT, Location TEXT, Description TEXT, Company TEXT, Apply_info TEXT, Salary FLOAT, RawMessage TEXT); ''')
     return
 
 # Query the database.
@@ -47,20 +47,25 @@ def delete_job(cursor, jobdetails):
 
 # Grab new jobs from a website
 def fetch_new_jobs(cursor, arg_dict):
-   # Code from https://github.com/RTCedu/CNA336/blob/master/Spring2018/Sql.py
-   query = "https://jobs.github.com/positions.json?description=&location=washington" # Add arguments here
-   jsonpage = 0
-   try:
-       contents = urllib.request.urlopen(query)
-       response = contents.read()
-       jsonpage = json.loads(response)
-       for page in jsonpage:
-           print(page['location'])
-           page['location']
-           cursor.execute("INSERT INTO Jobs ("+page['PostDate']+", "+page['Title']+", "+page['Location']+", "+page['Description']+", "+page['Company']+", "+page['Apply_info']+", "+page['Salary']+", "+page['RawMessage']+") "
-   except:
-       pass
-   return jsonpage
+    # Code from https://github.com/RTCedu/CNA336/blob/master/Spring2018/Sql.py
+    query = "https://jobs.github.com/positions.json?description=&location=washington" # Add arguments here
+    jsonpage = 0
+    contents = urllib.request.urlopen(query)
+    response = contents.read()
+    jsonpage = json.loads(response)
+    for page in jsonpage:
+        print(page['location'])
+        page['description'] = str(page['description']).replace('\"', '')
+        page['how_to_apply'] = str(page['description']).replace('\"', '')
+        cursor.execute('''INSERT INTO Jobs (PostDate, Title, Location, Description, Company, Apply_info) VALUES (
+        "''' + page['created_at'] + '''",
+        "''' + page['title'] + '''",
+        "''' + page['location'] + '''",
+        "''' + page['description'] + '''",
+        "''' + page['company'] + '''",
+        "''' + page['how_to_apply'] + '''")''')
+
+
 # Load a text-based configuration file
 def load_config_file(filename):
     argument_dictionary = []
@@ -87,9 +92,9 @@ def load_config_file(filename):
     return argument_dictionary
 
 # Main area of the code.
-def jobhunt(arg_dict):
+def jobhunt(cursor, arg_dict):
     # Fetch jobs from website
-    jobpage = fetch_new_jobs(arg_dict)
+    jobpage = fetch_new_jobs(cursor, arg_dict)
     # print (jobpage)
     ## Add your code here to parse the job page
     #from bs4 import BeautifulSoup
@@ -126,8 +131,10 @@ def main():
     # Load text file and store arguments into dictionary
     arg_dict = load_config_file(sys.argv[1])
     while(1):
-        jobhunt(arg_dict)
+        jobhunt(cursor, arg_dict)
+        conn.commit()
         time.sleep(3600) # Sleep for 1h
+
 
 if __name__ == '__main__':
     main()
