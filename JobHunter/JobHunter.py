@@ -19,7 +19,7 @@ def connect_to_sql():
 # Create the table structure
 def create_tables(cursor, table):
     ## Add your code here. Starter code below
-    cursor.execute('''CREATE TABLE IF NOT EXISTS Jobs (id INT PRIMARY KEY, PostDate TEXT, Title TEXT, Location TEXT, Description TEXT, Company TEXT, Apply_info TEXT, Salary FLOAT, RawMessage TEXT); ''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Jobs (id INT PRIMARY KEY AUTO_INCREMENT, PostDate TEXT, Title TEXT, Location TEXT, Description TEXT, Company TEXT, Apply_info TEXT, Salary FLOAT, RawMessage TEXT, Github_ID TEXT); ''')
     return
 
 # Query the database.
